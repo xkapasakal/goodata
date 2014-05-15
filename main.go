@@ -6,6 +6,8 @@ import (
 	"encoding/xml"
 	"github.com/xkapasakal/go4OData/parser"
 	"io/ioutil"
+	"reflect"
+    "runtime"
 )
 
 
@@ -48,7 +50,7 @@ func main() {
 	}
 
 	type Association struct {
-		
+
 	}
 
 	type Schema struct {
@@ -145,4 +147,6 @@ func main() {
 	fmt.Printf("Email: %v\n", v.Email)
 	fmt.Printf("Groups: %v\n", v.Groups)
 	fmt.Printf("Address: %v\n", v.Address)
+
+	fmt.Printf("reflect: %v\n", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name())
 }
