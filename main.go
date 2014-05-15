@@ -13,15 +13,46 @@ import (
 func main() {
 	fmt.Printf("Hello, %s\n", parser.Parse())
 
+	type PropertyRef struct {
+		Name string `xml:"Name,attr"`
+	}
+
+	type Key struct {
+		PropertyRef []PropertyRef
+	}
+
+	type NavigationProperty struct {
+		Name string `xml:"Name,attr"`
+		Relationship string `xml:"Relationship,attr"`
+		ToRole string `xml:"ToRole,attr"`
+		FromRole string `xml:"FromRole,attr"`
+	}
+
+    type Property struct {
+    	Name string `xml:"Name,attr"`
+    	Type string `xml:"Type,attr"`
+    	Nullable bool `xml:"Nullable,attr"`
+    	MaxLength int32 `xml:"MaxLength,attr"`
+    	FixedLength bool `xml:"FixedLength,attr"`
+    	Unicode bool `xml:"Unicode,attr"`
+    }   
+
 	type EntityType struct {
 		XMLName xml.Name `xml:"http://schemas.microsoft.com/ado/2008/09/edm EntityType"`
 		Name string `xml:"Name,attr"`
+		Property []Property
+		NavigationProperty NavigationProperty
 		// Have to specify where to find episodes since this
 		// doesn't match the xml tags of the data that needs to go into it
 		// EpisodeList []Episode `xml:"Episode>"`
 	}
 
+	type Association struct {
+		
+	}
+
 	type Schema struct {
+		Namespace string `xml:"Namespace,attr"`
 		EntityType   []EntityType
 	}
 
@@ -56,9 +87,11 @@ func main() {
 
 	fmt.Printf("Edmx XMLName: %#v\n", q.XMLName)
 	fmt.Printf("DataServiceVersion: %#v\n", q.DataServices.DataServiceVersion)
+	fmt.Printf("First EntityType Property Name: %#v\n", q.DataServices.Schema[0].EntityType[0].Property[0].Name)
 	fmt.Printf("First EntityType Name: %#v\n", q.DataServices.Schema[0].EntityType[0].Name)
 	fmt.Printf("Count Schema: %#v\n", len(q.DataServices.Schema))
 	fmt.Printf("Count EntityType: %#v\n", len(q.DataServices.Schema[0].EntityType))
+	fmt.Printf("Count Property: %#v\n", len(q.DataServices.Schema[0].EntityType[0].Property))
 	fmt.Printf("Second Schema: %#v\n", q.DataServices.Schema[1])
 
 
