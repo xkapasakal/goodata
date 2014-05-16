@@ -25,6 +25,7 @@ func main() {
 		fmt.Println("error:", err)
 	}
 	fmt.Printf("customers: %+v\n", response.D)
+	fmt.Printf("count customers: %+v\n", len(response.D.Results))
 
 	var animalJsonBlob = []byte(`{"d": { "__next": "Kapas"}}`)
 	type Animal struct {
