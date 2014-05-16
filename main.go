@@ -168,42 +168,6 @@ func main() {
 	}
 	fmt.Println(u4)
 
-	var typesMap = map[string]string{
-		"Edm.Binary": "",
-		"Edm.Boolean": "bool",
-		"Edm.Byte": "",
-		"Edm.DateTime": "",
-		"Edm.Decimal": "",
-		"Edm.Double": "",
-		"Edm.Single": "",
-		"Edm.Guid": "",
-		"Edm.Int16": "",
-		"Edm.Int32": "int32",
-		"Edm.Int64": "int64",
-		"Edm.SByte": "",
-		"Edm.String": "string",
-		"Edm.Time": "",
-		"Edm.DateTimeOffset": "",
-		"Edm.Geography": "",
-		"Edm.GeographyPoint": "",
-		"Edm.GeographyLineString": "",
-		"Edm.GeographyPolygon": "",
-		"Edm.GeographyMultiPoint": "",
-		"Edm.GeographyMultiLineString": "",
-		"Edm.GeographyMultiPolygon": "",
-		"Edm.GeographyCollection": "",
-		"Edm.Geometry": "",
-		"Edm.GeometryPoint": "",
-		"Edm.GeometryLineString": "",
-		"Edm.GeometryPolygon": "",
-		"Edm.GeometryMultiPoint": "",
-		"Edm.GeometryMultiLineString": "",
-		"Edm.GeometryMultiPolygon": "",
-		"Edm.GeometryCollection": "",
-		"Edm.Stream": "",
-	}
-
-
 
     b, err := ioutil.ReadFile("sample-services/northwind.metadata.edmx")
     if err != nil { panic(err) }
@@ -216,7 +180,6 @@ func main() {
 	}
 
 	fmt.Printf("Edmx XMLName: %#v\n", q.XMLName)
-	fmt.Printf("Map: %#v\n", typesMap)
 	// fmt.Printf("DataServiceVersion: %#v\n", q.DataServices.DataServiceVersion)
 	// fmt.Printf("First EntityType Property Name: %#v\n", q.DataServices.Schema[0].EntityType[0].Property[0].Name)
 	// fmt.Printf("First EntityType Name: %#v\n", q.DataServices.Schema[0].EntityType[0].Name)
@@ -232,15 +195,13 @@ func main() {
 	fmt.Printf("EntityType: %#v\n", entityType)
 
 
-	file, err := os.Create("generated/structs.go");
+	file, err := os.Create("generated/odata.go");
 	if err != nil {
 		log.Fatal(err)
 	}
 	t, _ := template.ParseFiles("templates/data_context.tmpl")
-	err = t.Execute(file, q.DataServices.Schema[0])
-	if err != nil {
-		fmt.Printf("executing template error: %v", err)
-	}
+	err = t.Execute(file, q.DataServices)
+	if err != nil { fmt.Printf("error: %v", err) }
 
 	fmt.Printf("reflect: %v\n", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name())
 

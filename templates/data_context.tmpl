@@ -4,12 +4,19 @@ import (
 //	"reflect"
 //  "runtime"
     "time"
-    "fmt"
+//    "fmt"
     "github.com/nu7hatch/gouuid"
 )
+{{ range .Schema }} 
+	{{ range .EntityType }} 
+	type {{.Name}} struct { {{range .Property}} 
+		{{.Name}} {{ .ConvertTypes }} {{end}} 
+	}
+	{{end}}
 
-{{ range .EntityType }} 
-type {{.Name}} struct { {{range .Property}} 
-	{{.Name}} {{ .ConvertTypes }} {{end}} 
-}
+	{{ range .EntityContainer.EntitySet }} 
+	func {{.Name}}() []{{.EntityType}} { 
+		
+	}
+	{{end}} 
 {{end}} 
