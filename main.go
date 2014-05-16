@@ -8,12 +8,19 @@ import (
 	"io/ioutil"
 	"reflect"
     "runtime"
+    "github.com/nu7hatch/gouuid"
 )
 
 
 
 func main() {
 	fmt.Printf("Hello, %s\n", parser.Parse())
+	u4, err := uuid.NewV4()
+	if err != nil {
+	    fmt.Println("error:", err)
+	    return
+	}
+	fmt.Println(u4)
 
 	type PropertyRef struct {
 		Name string `xml:"Name,attr"`
@@ -49,17 +56,62 @@ func main() {
 		// EpisodeList []Episode `xml:"Episode>"`
 	}
 
-	type Association struct {
+	type End struct {
+		Multiplicity string `xml:"Multiplicity,attr"`
+		Type string `xml:"Type,attr"`
+		Role string `xml:"Role,attr"`
+		EntitySet string `xml:"EntitySet,attr"`
+	}
 
+	type Dependent struct {
+		Role string `xml:"Role,attr"`
+		PropertyRef PropertyRef
+	}
+
+	type Principal struct {
+		Role string `xml:"Role,attr"`
+		PropertyRef PropertyRef
+	}
+
+	type ReferentialConstraint struct {
+		Principal Principal
+		Dependent Dependent
+	}
+
+	type Association struct {
+		Name string `xml:"Name,attr"`
+		End []End
+		ReferentialConstraint ReferentialConstraint
+	}
+
+	type AssociationSet struct {
+		Name string `xml:"Name,attr"`
+		Association string `xml:"Association,attr"`
+		End []End
+	}
+
+	type EntitySet struct {
+		Name string `xml:"Name,attr"`
+		EntityType string `xml:"EntityType,attr"`
+	}
+
+	type EntityContainer struct {
+		Name string `xml:"Name,attr"`
+		IsDefaultEntityContainer bool `xml:"IsDefaultEntityContainer,attr"`
+		LazyLoadingEnabled bool `xml:"LazyLoadingEnabled,attr"`
+		EntitySet []EntitySet
+		AssociationSet []AssociationSet
 	}
 
 	type Schema struct {
 		Namespace string `xml:"Namespace,attr"`
 		EntityType   []EntityType
+		EntityContainer EntityContainer
 	}
 
 	type DataServices struct {
 		DataServiceVersion string `xml:"DataServiceVersion,attr"`
+		MaxDataServiceVersion float32 `xml:"MaxDataServiceVersion,attr"`
 		Schema []Schema
 	}
 
@@ -69,16 +121,9 @@ func main() {
 	}
 
 
-    // read whole the file
+
     b, err := ioutil.ReadFile("sample-services/northwind.metadata.edmx")
     if err != nil { panic(err) }
-
-	// xmlFile, err := os.Open("sample-services/northwind.metadata.edmx")
-	// if err != nil {
-	// 	fmt.Println("Error opening file:", err)
-	// 	return
-	// }
-	// defer xmlFile.Close()
 	
 	var q Edmx
 	err = xml.Unmarshal(b, &q)
@@ -96,8 +141,11 @@ func main() {
 	fmt.Printf("Count Property: %#v\n", len(q.DataServices.Schema[0].EntityType[0].Property))
 	fmt.Printf("Second Schema: %#v\n", q.DataServices.Schema[1])
 
+	for _,element := range q.DataServices.Schema {
+		fmt.Printf("Second Schema: %#v\n", element)	  
+	}
 
-
+	fmt.Printf("reflect: %v\n", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name())
 
 
 
@@ -147,6 +195,4 @@ func main() {
 	fmt.Printf("Email: %v\n", v.Email)
 	fmt.Printf("Groups: %v\n", v.Groups)
 	fmt.Printf("Address: %v\n", v.Address)
-
-	fmt.Printf("reflect: %v\n", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name())
 }
