@@ -1,4 +1,4 @@
-go4OData
+goodata
 ========
 
 Go OData client
