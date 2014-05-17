@@ -1,20 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/xkapasakal/go4OData/generated"
-	"encoding/json"
 )
 
 type DType struct {
-	Next string `json:"__next"`
+	Next    string `json:"__next"`
 	Results []generated.Customer
 }
 
 type Response struct {
 	D DType
 }
-
 
 func main() {
 
