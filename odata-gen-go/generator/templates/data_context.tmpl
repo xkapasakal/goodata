@@ -1,0 +1,22 @@
+package odata
+
+import (
+//	"reflect"
+//  "runtime"
+    "time"
+//    "fmt"
+    "github.com/nu7hatch/gouuid"
+)
+{{ range .Schema }} 
+	{{ range .EntityType }} 
+	type {{.Name}} struct { {{range .Property}} 
+		{{.Name}} {{ .ConvertTypes }} {{end}} 
+	}
+	{{end}}
+
+	{{ range .EntityContainer.EntitySet }} 
+	func {{.Name}}() []{{.EntityType}} { 
+		
+	}
+	{{end}} 
+{{end}} 
