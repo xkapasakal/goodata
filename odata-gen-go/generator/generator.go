@@ -12,10 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"strings"
-	"text/template"
 )
 
 type Generator struct {
@@ -39,6 +36,11 @@ func New(path string) *Generator {
 	return g
 }
 
+func New() *Generator {
+	g := new(Generator)
+	return g
+}
+
 // Fail reports a problem and exits the program.
 func (g *Generator) Fail(msgs ...string) {
 	s := strings.Join(msgs, " ")
@@ -57,44 +59,10 @@ func (g *Generator) Generate() {
 
 	for _, schema := range edmx.DataServices.Schema {
 		if len(schema.EntityType) > 0 {
-			file, err := os.Create(strings.ToLower(schema.Namespace) + ".od.go")
-			if err != nil {
-				log.Fatal(err)
-			}
-
 			g.generateHeader()
 			g.generatePackage(schema)
 			g.generateImports()
 			g.generateEntityTypes(schema)
-
-			g.WriteTo(file)
-
-			// cmd := exec.Command("go fmt")
-
-			// cmd.Stdin = strings.NewReader(path)
-			// fmt.Printf("Generated file name: %q\n", path)
-			// var out bytes.Buffer
-			// cmd.Stdout = &out
-			// err = cmd.Run()
-			// if err != nil {
-			// 	fmt.Printf("error: %v", err)
-			// }
-			// fmt.Printf("in all caps: %q\n", out.String())
-
-			path, _ := filepath.Abs(file.Name())
-			app := "go"
-			arg0 := "fmt"
-			arg1 := path
-
-			cmd := exec.Command(app, arg0, arg1)
-			out, err := cmd.Output()
-
-			if err != nil {
-				println(err.Error())
-				return
-			}
-
-			print(string(out))
 
 			// Reformat generated code.
 			fset := token.NewFileSet()
@@ -103,20 +71,19 @@ func (g *Generator) Generate() {
 				g.Fail("bad Go source code was generated:", err.Error())
 				return
 			}
-			// g.Reset()
+
+			g.Reset()
 			err = (&printer.Config{Mode: printer.TabIndent | printer.UseSpaces, Tabwidth: 8}).Fprint(g, fset, ast)
 			if err != nil {
 				g.Fail("generated Go source code could not be reformatted:", err.Error())
 			}
 
-			t, parse_err := template.ParseFiles("templates/types.tmpl")
-			if parse_err != nil {
-				log.Fatal(parse_err)
-			}
-			err = t.Execute(file, schema)
+			file, err := os.Create(strings.ToLower(schema.Namespace) + ".od.go")
 			if err != nil {
-				fmt.Printf("error: %v", err)
+				log.Fatal(err)
 			}
+			g.WriteTo(file)
+
 		}
 	}
 }
