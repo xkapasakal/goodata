@@ -36,11 +36,6 @@ func New(path string) *Generator {
 	return g
 }
 
-func New() *Generator {
-	g := new(Generator)
-	return g
-}
-
 // Fail reports a problem and exits the program.
 func (g *Generator) Fail(msgs ...string) {
 	s := strings.Join(msgs, " ")
